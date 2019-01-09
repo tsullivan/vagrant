@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+TAG=${STACK_VERSION:-'6.5.4'}
+
+wget --no-verbose https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${TAG}.tar.gz
+tar xzf elasticsearch-${TAG}.tar.gz
+ln -s elasticsearch-${TAG} elasticsearch
+
+wget --no-verbose https://artifacts.elastic.co/downloads/kibana/kibana-${TAG}-linux-x86_64.tar.gz
+tar xzf kibana-${TAG}-linux-x86_64.tar.gz
+ln -s kibana-${TAG}-linux-x86_64 kibana
+
+cp /vagrant/config/kibana.yml kibana/config/kibana.yml
+cp /vagrant/config/elasticsearch.yml elasticsearch/config/elasticsearch.yml
+cp /vagrant/config/jvm.options elasticsearch/config/jvm.options
+
+# IF PRE-6.0:
+#cd $CURRENT_DIR/kibana
+#./bin/kibana-plugin install x-pack
+#cd $CURRENT_DIR/elasticsearch
+#./bin/elasticsearch-plugin install x-pack
