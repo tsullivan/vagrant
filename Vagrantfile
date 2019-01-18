@@ -3,7 +3,7 @@
 
 boxes = [
   {:name => "centos-7", :version => "1811.02", :box => "centos/7"},
-  {:name => "oraclelinux-6.10", :version => "0", :box => "oraclelinux/6.10"},
+  {:name => "ol-6.10", :version => "0", :box => "ol/6.10"},
 ]
 
 

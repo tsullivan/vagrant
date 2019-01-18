@@ -16,7 +16,7 @@ Bring machine 'centos-7' up with 'virtualbox' provider:
 
 Some boxes are not available on Vagrant Cloud. To install those boxes, do:
   ```
-  vagrant box add --name oraclelinux/6.10 https://yum.oracle.com/boxes/oraclelinux/ol610/ol610.box
+  vagrant box add --name ol/6.10 https://yum.oracle.com/boxes/oraclelinux/ol610/ol610.box
   ```
 
 ## What is in the boxes
