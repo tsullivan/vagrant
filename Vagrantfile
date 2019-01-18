@@ -29,11 +29,11 @@ Vagrant.configure(2) do |config|
 
     sh_set_prompt config, box[:name]
 
-    config.vm.provision "os-dependencies", type: "shell" do |script|
+    config.vm.provision "install-os-dependencies", type: "shell" do |script|
       script.path = "./share/scripts/#{box[:name]}.sh" # install os dependencies
     end
 
-    config.vm.provision "stack-artifacts", type: "shell", env: {"STACK_VERSION" => ENV["STACK_VERSION"]}, privileged: false do |script|
+    config.vm.provision "download-stack-artifacts", type: "shell", env: {"STACK_VERSION" => ENV["STACK_VERSION"]}, privileged: false do |script|
       script.path = "./share/scripts/get_stack.sh" # download stack builds
     end
   end
@@ -43,7 +43,7 @@ end
 # contain overrides for root and vagrant but this attempts to work around
 # them by re-source-ing the standard prompt file.
 def sh_set_prompt(config, name)
-  config.vm.provision "set prompt", type: "shell", inline: <<-SHELL
+  config.vm.provision "set-prompt", type: "shell", inline: <<-SHELL
       cat \<\<PROMPT > /etc/profile.d/boxname_prompt.sh
 export PS1="#{name}:\\w$ "
 PROMPT
