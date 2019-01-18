@@ -30,11 +30,11 @@ Vagrant.configure(2) do |config|
     sh_set_prompt config, box[:name]
 
     config.vm.provision "os-dependencies", type: "shell" do |script|
-      script.path = "./scripts/#{box[:name]}.sh" # install os dependencies
+      script.path = "./share/scripts/#{box[:name]}.sh" # install os dependencies
     end
 
     config.vm.provision "stack-artifacts", type: "shell", env: {"STACK_VERSION" => ENV["STACK_VERSION"]}, privileged: false do |script|
-      script.path = "./scripts/get_stack.sh" # download stack builds
+      script.path = "./share/scripts/get_stack.sh" # download stack builds
     end
   end
 end
