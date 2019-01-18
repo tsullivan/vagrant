@@ -3,6 +3,7 @@
 
 boxes = [
   {:name => "centos-7", :version => "1811.02", :box => "centos/7"},
+  {:name => "oraclelinux-6.10", :version => "0", :box => "oraclelinux/6.10"},
 ]
 
 
@@ -28,11 +29,11 @@ Vagrant.configure(2) do |config|
 
     sh_set_prompt config, box[:name]
 
-    config.vm.provision "shell" do |script|
+    config.vm.provision "os-dependencies", type: "shell" do |script|
       script.path = "./scripts/#{box[:name]}.sh" # install os dependencies
     end
 
-    config.vm.provision "shell", env: {"STACK_VERSION" => ENV["STACK_VERSION"]}, privileged: false do |script|
+    config.vm.provision "stack-artifacts", type: "shell", env: {"STACK_VERSION" => ENV["STACK_VERSION"]}, privileged: false do |script|
       script.path = "./scripts/get_stack.sh" # download stack builds
     end
   end
