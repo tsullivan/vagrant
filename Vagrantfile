@@ -27,7 +27,7 @@ Vagrant.configure(2) do |config|
       machine.vm.box_version = box[:version]
     end
 
-    sh_set_prompt config, box[:name]
+    sh_set_profile config, box[:name]
 
     config.vm.provision "install-os-dependencies", type: "shell" do |script|
       script.path = "./share/scripts/#{box[:name]}.sh" # install os dependencies
@@ -42,20 +42,12 @@ end
 # Sets up a consistent prompt for all users. Or tries to. The VM might
 # contain overrides for root and vagrant but this attempts to work around
 # them by re-source-ing the standard prompt file.
-def sh_set_prompt(config, name)
+def sh_set_profile(config, name)
+  config.vm.provision "set-path", type: "shell", inline: <<-SHELL
+    echo 'export JAVA_HOME=$(find /usr/lib/jvm/java-* -type d -name jre | head -1)' >> /etc/profile.d/java_home.sh
+  SHELL
+
   config.vm.provision "set-prompt", type: "shell", inline: <<-SHELL
-      cat \<\<PROMPT > /etc/profile.d/boxname_prompt.sh
-export PS1="#{name}:\\w$ "
-PROMPT
-      grep "source /etc/profile.d/boxname_prompt.sh" ~/.bashrc |
-        cat \<\<SOURCE_PROMPT >> ~/.bashrc
-# Replace the standard prompt with a consistent one
-source /etc/profile.d/boxname_prompt.sh
-SOURCE_PROMPT
-      grep "source /etc/profile.d/boxname_prompt.sh" ~vagrant/.bashrc |
-        cat \<\<SOURCE_PROMPT >> ~vagrant/.bashrc
-# Replace the standard prompt with a consistent one
-source /etc/profile.d/boxname_prompt.sh
-SOURCE_PROMPT
+    echo 'export PS1="#{name}:\\w$ "' > /etc/profile.d/boxname_prompt.sh
   SHELL
 end
