@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-TAG=${STACK_VERSION:-'6.5.4'}
+TAG=${STACK_VERSION:-'6.6.1'}
 
 wget --no-verbose https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${TAG}.tar.gz
 tar xzf elasticsearch-${TAG}.tar.gz
