@@ -3,10 +3,10 @@
 set -e
 set -o pipefail
 
-TAG=${STACK_VERSION:-'6.6.1'}
+TAG=${STACK_VERSION:-'7.7.1'}
 
-wget --no-verbose https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${TAG}.tar.gz
-tar xzf elasticsearch-${TAG}.tar.gz
+wget --no-verbose https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${TAG}-linux-x86_64.tar.gz
+tar xzf elasticsearch-${TAG}-linux-x86_64.tar.gz
 ln -s elasticsearch-${TAG} elasticsearch
 
 wget --no-verbose https://artifacts.elastic.co/downloads/kibana/kibana-${TAG}-linux-x86_64.tar.gz

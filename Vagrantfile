@@ -4,11 +4,12 @@
 boxes = [
   {:name => "centos-7", :version => "1811.02", :box => "centos/7"},
   {:name => "ol-6.10", :version => "0", :box => "ol/6.10"},
+  {:name => "rhel-8", :version => "3.0.8", :box => "generic/rhel8"},
 ]
 
 
 Vagrant.configure(2) do |config|
-  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  config.vm.synced_folder "share/", "/vagrant", type: "virtualbox"
 
   config.vm.provider "virtualbox" do |vbox|
     # see https://github.com/hashicorp/vagrant/issues/9524
