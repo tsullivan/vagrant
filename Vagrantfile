@@ -2,6 +2,7 @@
 # vi: set ft=ruby :
 
 boxes = [
+  {:name => "centos-8", :version => "1905.1", :box => "centos/8"},
   {:name => "centos-7", :version => "1811.02", :box => "centos/7"},
   {:name => "ol-6.10", :version => "0", :box => "ol/6.10"},
   {:name => "rhel-8", :version => "3.0.8", :box => "generic/rhel8"},
