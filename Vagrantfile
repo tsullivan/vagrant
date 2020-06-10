@@ -47,6 +47,6 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
     yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-    yum install -y wget fontconfig
+    yum install -y wget fontconfig vlgothic-fonts
   SHELL
 end
