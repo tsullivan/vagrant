@@ -13,9 +13,9 @@ wget --no-verbose https://artifacts.elastic.co/downloads/kibana/kibana-${TAG}-li
 tar xzf kibana-${TAG}-linux-x86_64.tar.gz
 ln -s kibana-${TAG}-linux-x86_64 kibana
 
-cp /vagrant/config/kibana.yml kibana/config/kibana.yml
-cp /vagrant/config/elasticsearch.yml elasticsearch/config/elasticsearch.yml
-cp /vagrant/config/jvm.options elasticsearch/config/jvm.options
+cp /vagrant/share/config/kibana.yml kibana/config/kibana.yml
+cp /vagrant/share/config/elasticsearch.yml elasticsearch/config/elasticsearch.yml
+cp /vagrant/share/config/jvm.options elasticsearch/config/jvm.options
 
 # IF PRE-6.0:
 #cd $CURRENT_DIR/kibana

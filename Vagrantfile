@@ -1,48 +1,52 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-boxes = [
-  {:name => "centos-8", :version => "1905.1", :box => "centos/8"},
-  {:name => "centos-7", :version => "1811.02", :box => "centos/7"},
-  {:name => "ol-6.10", :version => "0", :box => "ol/6.10"},
-  {:name => "rhel-8", :version => "3.0.8", :box => "generic/rhel8"},
-]
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  # The most common configuration options are documented and commented below.
+  # For a complete reference, please see the online documentation at
+  # https://docs.vagrantup.com.
 
+  # Every Vagrant development environment requires a box. You can search for
+  # boxes at https://vagrantcloud.com/search.
+  config.vm.box = "bento/centos-8.1" # alternatives: "generic/centos8" (or "centos/8" if it gets updated)
+  config.vm.box_version = "202005.21.0"
 
-Vagrant.configure(2) do |config|
-  config.vm.synced_folder "share/", "/vagrant", type: "virtualbox"
+  # Disable automatic box update checking. If you disable this, then
+  # boxes will only be checked for updates when the user runs
+  # `vagrant box outdated`. This is not recommended.
+  # config.vm.box_check_update = false
 
+  # Create a forwarded port mapping which allows access to a specific port
+  # within the machine from a port on the host machine. 
+  config.vm.network :forwarded_port, guest: 5601, host: 5666 # Start Kibana and go to localhost:5666 in your host's browser
+
+  # Share an additional folder to the guest VM. The first argument is
+  # the path on the host to the actual folder. The second argument is
+  # the path on the guest to mount the folder. And the optional third
+  # argument is a set of non-required options.
+  config.vm.synced_folder "share", "/home/vagrant/share"
+
+  # Provider-specific configuration so you can fine-tune various
+  # backing providers for Vagrant. These expose provider-specific options.
   config.vm.provider "virtualbox" do |vbox|
-    # see https://github.com/hashicorp/vagrant/issues/9524
     vbox.customize ["modifyvm", :id, "--audio", "none"]
-    # https://www.vagrantup.com/docs/virtualbox/configuration.html
-    vbox.memory = 1024
+    vbox.memory = 4096
     vbox.cpus = 1
   end
 
-  boxes.each do |box|
-    config.vm.network :forwarded_port, guest: 5601, host: 5666, auto_correct: true
-    config.vm.synced_folder "./share", "/vagrant", id: "vagrant-share"
+  #
+  # View the documentation for the provider you are using for more
+  # information on available options.
 
-    config.vm.define box[:name], autostart: false do |machine|
-      machine.vm.box = box[:box]
-      machine.vm.box_version = box[:version]
-    end
-
-    sh_set_javahome config
-
-    config.vm.provision "install-os-dependencies", type: "shell" do |script|
-      script.path = "./share/scripts/#{box[:name]}.sh" # install os dependencies
-    end
-
-    config.vm.provision "download-stack-artifacts", type: "shell", env: {"STACK_VERSION" => ENV["STACK_VERSION"]}, privileged: false do |script|
-      script.path = "./share/scripts/get_stack.sh" # download stack builds
-    end
-  end
-end
-
-def sh_set_javahome(config)
-  config.vm.provision "set-javahome", type: "shell", inline: <<-SHELL
-    echo 'export JAVA_HOME=$(find /usr/lib/jvm/java-* -type d -name jre | head -1)' >> /etc/profile.d/java_home.sh
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  config.vm.provision "shell", inline: <<-SHELL
+    yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    yum install -y wget fontconfig
   SHELL
 end

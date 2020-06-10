@@ -3,7 +3,6 @@
 set -e
 set -o pipefail
 
-yum install -y wget java
 
 FILE=/etc/profile.d/boxname_prompt.sh
 cat > $FILE <<- EOB
