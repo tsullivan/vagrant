@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -x
 set -o pipefail
 
 TAG=${STACK_VERSION:-'7.7.1'}
