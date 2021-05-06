@@ -1,10 +1,8 @@
-server.name: "centos7"
 server.host: "0.0.0.0"
-logging.verbose: true
-elasticsearch.hosts: "https://paninix:9200"
+elasticsearch.hosts: "https://elasticsearch:9200"
 elasticsearch.ssl.certificateAuthorities: "config/cert-bundle/ca/ca.crt"
 
-elasticsearch.username: "kibana"
+elasticsearch.username: "kibana_system"
 elasticsearch.password: "changeme"
 
 server.ssl.certificate: "config/cert-bundle/localhost/localhost.crt"
