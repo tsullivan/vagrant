@@ -1,0 +1,18 @@
+server.host: 0.0.0.0
+
+elasticsearch:
+  hosts: ['https://elasticsearch:9200']
+  ssl.certificateAuthorities: ['config/cert-bundle/ca/ca.crt']
+
+logging:
+  loggers:
+    - name: plugins.reporting
+      appenders: [console]
+      level: debug
+
+xpack.reporting:
+  encryptionKey: fixme
+  roles.enabled: false
+  capture.timeouts:
+    renderComplete: 1m
+    waitForElements: 1m

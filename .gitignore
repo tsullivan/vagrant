@@ -1,3 +1,4 @@
 .vagrant
 share/config/cert-bundle
-share/kibana-7*
+share/config/kibana.yml
+share/log*
