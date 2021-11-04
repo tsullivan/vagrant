@@ -14,7 +14,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     set -e
     echo "10.0.2.2  elasticsearch" >> /etc/hosts
+    apt update
     apt install -y libnss3 fonts-liberation libfontconfig1
+    apt install -y jq
   SHELL
 
   config.vm.provision "shell", inline: "sudo apt install swapspace -y" # https://islascruz.org/blog/2017/08/30/quick-tip-vagrant-ram/
