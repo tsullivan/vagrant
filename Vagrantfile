@@ -10,18 +10,10 @@ Vagrant.configure("2") do |config|
     vbox.gui = false
   end
 
-  # Set up
-  config.vm.provision "shell", inline: <<-SHELL
-    set -e
-    echo "10.0.2.2  elasticsearch" >> /etc/hosts
-    apt-get update
-    apt-get install -y libnss3 fonts-liberation libfontconfig1
-    apt-get install -y jq
-  SHELL
-
   # https://islascruz.org/blog/2017/08/30/quick-tip-vagrant-ram/
   # enable auto-sizing swap service
   config.vm.provision "shell", inline: "sudo apt-get install swapspace -y"
 
+  # Set up
   config.vm.provision "shell", inline: "sh /vagrant/share/bootstrap.sh"
 end
