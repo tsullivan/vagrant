@@ -14,7 +14,6 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell", inline: "sh /vagrant/bootstrap.sh"
 
-  # Centos machine
   config.vm.define "kibana-reporting-centos" do |centos|
     centos.vm.box = "centos/8"
     centos.vm.box_version = "2011.0"
@@ -27,7 +26,6 @@ Vagrant.configure("2") do |config|
     centos.vm.provision "shell", inline: "sh /vagrant/bootstrap.sh"
   end
 
-  # Ubuntu machine
   config.vm.define "kibana-reporting-ubuntu" do |ubuntu|
     ubuntu.vm.box = "ubuntu/focal64"
     ubuntu.vm.box_version = "20211026.0.0"
