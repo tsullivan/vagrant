@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-VERSION=7.16.0 # version of snapshot builds to download
+VERSION=8.1.0 # version of snapshot builds to download
 
 MANIFEST=$(curl --silent -XGET https://artifacts-api.elastic.co/v1/versions/$VERSION-SNAPSHOT/builds)
 BUILD_HASH=$(echo $MANIFEST | jq -r '.builds[0]')
