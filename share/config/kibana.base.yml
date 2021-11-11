@@ -7,14 +7,22 @@ elasticsearch:
   ssl.certificateAuthorities: ['config/cert-bundle/ca/ca.crt']
 
 logging:
+  appenders.default:
+    type: file
+    fileName: log/kibana.log
+    layout:
+      type: json
   loggers:
     - name: plugins.reporting
-      appenders: [console]
+      appenders: [default, console]
       level: debug
+
 
 xpack.reporting:
   encryptionKey: fixme
   roles.enabled: false
-  capture.timeouts:
-    renderComplete: 1m
-    waitForElements: 1m
+  capture:
+    maxAttempts: 1
+    timeouts:
+      renderComplete: 1m
+      waitForElements: 1m
