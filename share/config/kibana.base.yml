@@ -7,9 +7,17 @@ elasticsearch:
   ssl.certificateAuthorities: ['config/cert-bundle/ca/ca.crt']
 
 logging:
+  appenders:
+    file:
+      type: file
+      fileName: /home/vagrant/log/kibana.log
+      layout:
+        type: json
+  root:
+    appenders: [default, file]
   loggers:
     - name: plugins.reporting
-      appenders: [console]
+      appenders: [file]
       level: debug
 
 xpack.reporting:
