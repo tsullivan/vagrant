@@ -12,8 +12,6 @@ Vagrant.configure("2") do |config|
     vbox.gui = false
   end
 
-  config.vm.provision "shell", inline: "sh /vagrant/bootstrap.sh"
-
   # Centos machine
   config.vm.define "kibana-reporting-centos" do |centos|
     centos.vm.box = "centos/8"
