@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 HOST="http://localhost:5666"
 AUTH="elastic:changeme"
-WIDTH=600
+WIDTH=2500
 
 IDS=(
 ec6707c0-48ad-11ec-b7c6-75ff290ed937
