@@ -23,7 +23,7 @@ const printData = async () => {
 
   const template = JSON.stringify(getSettings());
   lag(`PUT /_index_template/${indexPre}-dev`);
-  lag(`{"index_patterns":["${indexName}*"], "template":${template}}`);
+  lag(`{"index_patterns":["${indexPre}*"], "template":${template}}`);
   lag(`POST /${indexName}/_bulk`);
 
   const rawFile = await fs.readFile(fileName, 'utf8');
