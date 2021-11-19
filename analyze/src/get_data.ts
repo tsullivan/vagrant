@@ -3,20 +3,22 @@ import { fields } from './fields';
 
 export type JobLog = any;
 
-function isCompleteLog(jobLog: object[] = []): jobLog is object[] {
-  return jobLog.length === 10;
+function isCompleteLog(jobId: string, message?: string) {
+  return message?.match(`Stopping ${jobId}`);
 }
 
-const checkJobId = (jobId: string, logLine: object) => {
+const checkJobId = (jobId: string) => {
+  let validJobId = false;
   try {
     assert(jobId && jobId.length === 24);
-  } catch (err) {
-    throw new Error(`Could not parse line '${JSON.stringify(logLine)}' ${err}`);
-  }
+    validJobId = true;
+  } catch (err) {}
+  return validJobId;
 };
 
 const claimingRe = /^.*Claiming PNGV2 (\S+).*$/;
-const jobIdFromTagsReg = /^.*([a-z0-9]{24}).*$/;
+const jobIdFromMessageRe = /^.*(_doc\/|task:|job |report |Stopping )([0-9a-z]+).*$/;
+const jobIdFromTagsRe = /^.*([a-z0-9]{24}).*$/;
 
 function* myGenerator(rawData: string[]) {
   const testLogs = new Map<string, object[]>();
@@ -25,7 +27,7 @@ function* myGenerator(rawData: string[]) {
     const item = rawData[i];
     const line = item.trim();
     if (!line) {
-      break;
+      continue;
     }
 
     const logLine: Record<string, any> = JSON.parse(item);
@@ -35,12 +37,16 @@ function* myGenerator(rawData: string[]) {
     // get the job id string
     if (message.match(/Claiming/)) {
       jobId = message.replace(claimingRe, '$1');
+    } else if (message.match(/[0-9a-z]{24}/)) {
+      jobId = message.replace(jobIdFromMessageRe, '$2');
     } else {
       const tags = logLine.log.logger;
-      jobId = tags.replace(jobIdFromTagsReg, '$1');
+      jobId = tags.replace(jobIdFromTagsRe, '$1');
     }
 
-    checkJobId(jobId, logLine);
+    if (!checkJobId(jobId)) {
+      continue;
+    }
 
     // type check the testRuns map if the job id exists
     // update the array if the key exists
@@ -54,8 +60,8 @@ function* myGenerator(rawData: string[]) {
     }
 
     // if the testRun data is complete, then yield it and remove it from the Map
-    const latest = testLogs.get(jobId);
-    if (isCompleteLog(latest)) {
+    const latest = testLogs.get(jobId)!;
+    if (isCompleteLog(jobId, logLine.message)) {
       const doc = fields.reduce(
         (acc, field) => ({
           ...acc,
@@ -70,4 +76,4 @@ function* myGenerator(rawData: string[]) {
   }
 }
 
-export const getData = (fileData: string[]): Generator<object> => myGenerator(fileData);
+export const getData = (fileData: string[]): Generator<any> => myGenerator(fileData);

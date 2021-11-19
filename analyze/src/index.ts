@@ -29,7 +29,7 @@ const printData = async () => {
   const rawFile = await fs.readFile(fileName, 'utf8');
   const data = getData(rawFile.split('\n'));
   for (const doc of data) {
-    lag(`{"index":{}}`);
+    lag(`{"index":{"_id":"${doc.job_id}"}}`);
     lag(JSON.stringify(doc));
   }
 };
