@@ -2,8 +2,8 @@ import { JobLog } from "src/get_data";
 
 export type MappingTypeValue = 'date' | 'keyword' | 'integer' | 'boolean';
 
-export interface FieldDefinition<T> {
+export interface FieldDefinition<T = unknown> {
   readonly name: string;
-  readonly type: MappingTypeValue;
-  getValue(jobLogs: JobLog[], iteration: number): T;
+  readonly type?: MappingTypeValue;
+  getValue(jobId: string, jobLogs: JobLog[]): T;
 }

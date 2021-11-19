@@ -1,6 +1,7 @@
-import { getSettings } from './get_settings';
-import { getData } from './get_data';
 import assert from 'assert';
+import { promises as fs } from 'fs';
+import { getData } from './get_data';
+import { getSettings } from './get_settings';
 
 const argv = require('yargs').argv;
 
@@ -14,30 +15,22 @@ try {
 
 // eslint-disable-next-line no-console
 const lag = (message: string) => console.log(message);
-const INDEX_PREFIX = 'png_benchmarks-';
-
-type DataSetName = '001';
-const sets: DataSetName[] = ['001'];
+const indexPre = `png_benchmarks`;
+const indexName = `${indexPre}-001`;
 
 const printData = async () => {
-  for (const set of sets) {
-    lag(`DELETE /${INDEX_PREFIX}${set}`);
-  }
+  lag(`DELETE /${indexName}`);
 
   const template = JSON.stringify(getSettings());
-  lag(`PUT /_index_template/${INDEX_PREFIX}dev`);
-  lag(`{"index_patterns": ["${INDEX_PREFIX}*"], "template": ${template}}`);
+  lag(`PUT /_index_template/${indexPre}-dev`);
+  lag(`{"index_patterns":["${indexName}*"], "template":${template}}`);
+  lag(`POST /${indexName}/_bulk`);
 
-  const data = await getData(fileName);
-  const datasets: Record<DataSetName, string[]> = {
-    '001': data,
-  };
-
-  for (const set of sets) {
-    lag(`POST /${INDEX_PREFIX}${set}/_bulk`);
-    for (const doc of datasets[set]) {
-      lag(doc);
-    }
+  const rawFile = await fs.readFile(fileName, 'utf8');
+  const data = getData(rawFile.split('\n'));
+  for (const doc of data) {
+    lag(`{"index":{}}`);
+    lag(JSON.stringify(doc));
   }
 };
 
