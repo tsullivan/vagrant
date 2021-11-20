@@ -1,10 +1,9 @@
 import assert from 'assert';
-import { fields } from './fields';
+import { fieldDefinitions } from './fields';
 
-export type JobLog = any;
-
-function isCompleteLog(jobId: string, message?: string) {
-  return message?.match(`Stopping ${jobId}`);
+export interface LogLine {
+  message: string;
+  log: { logger: string };
 }
 
 const checkJobId = (jobId: string) => {
@@ -12,13 +11,11 @@ const checkJobId = (jobId: string) => {
   try {
     assert(jobId && jobId.length === 24);
     validJobId = true;
-  } catch (err) {}
+  } catch (err) {
+    // ignore: non-reporting log
+  }
   return validJobId;
 };
-
-const claimingRe = /^.*Claiming PNGV2 (\S+).*$/;
-const jobIdFromMessageRe = /^.*(_doc\/|task:|job |report |Stopping )([0-9a-z]+).*$/;
-const jobIdFromTagsRe = /^.*([a-z0-9]{24}).*$/;
 
 function* myGenerator(rawData: string[]) {
   const testLogs = new Map<string, object[]>();
@@ -30,19 +27,8 @@ function* myGenerator(rawData: string[]) {
       continue;
     }
 
-    const logLine: Record<string, any> = JSON.parse(item);
-    const { message } = logLine;
-    let jobId: string;
-
-    // get the job id string
-    if (message.match(/Claiming/)) {
-      jobId = message.replace(claimingRe, '$1');
-    } else if (message.match(/[0-9a-z]{24}/)) {
-      jobId = message.replace(jobIdFromMessageRe, '$2');
-    } else {
-      const tags = logLine.log.logger;
-      jobId = tags.replace(jobIdFromTagsRe, '$1');
-    }
+    const logLine: LogLine = JSON.parse(item);
+    const jobId = fieldDefinitions.getJobId(logLine);
 
     if (!checkJobId(jobId)) {
       continue;
@@ -51,7 +37,6 @@ function* myGenerator(rawData: string[]) {
     // type check the testRuns map if the job id exists
     // update the array if the key exists
     // create a new array with the key if it doesnt exist
-
     const exists = testLogs.get(jobId);
     if (exists) {
       testLogs.set(jobId, [...exists, logLine]);
@@ -61,16 +46,8 @@ function* myGenerator(rawData: string[]) {
 
     // if the testRun data is complete, then yield it and remove it from the Map
     const latest = testLogs.get(jobId)!;
-    if (isCompleteLog(jobId, logLine.message)) {
-      const doc = fields.reduce(
-        (acc, field) => ({
-          ...acc,
-          [field.name]: field.getValue(jobId, latest),
-        }),
-        {}
-      );
-
-      yield doc;
+    if (fieldDefinitions.isCompleteLog(jobId, logLine.message)) {
+      yield fieldDefinitions.getDocument(jobId, latest);
       testLogs.delete(jobId);
     }
   }

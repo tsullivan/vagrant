@@ -1,5 +1,6 @@
 import { FieldDefinition } from './lib/field_definition';
 import moment from 'moment';
+import { LogLine } from './get_data';
 
 interface DataSet {
   dates: FieldDefinition<moment.Moment>[];
@@ -101,7 +102,9 @@ const datas: DataSet = {
     {
       name: 'take_screenshots_time',
       getValue(_jobId, logs) {
-        const startLine = logs.find((log) => log.message.match(`(taking|streaming) screenshots`));
+        const startLine = logs.find((log) =>
+          log.message.match(`(taking|streaming) screenshots`)
+        );
         if (!startLine) {
           return null;
         }
@@ -174,9 +177,44 @@ const datas: DataSet = {
   ],
 };
 
-export const fields: FieldDefinition[] = [
+class FieldHelper {
+  private claimingRe = /^.*Claiming PNGV2 (\S+).*$/;
+  private jobIdFromMessageRe = /^.*(_doc\/|task:|job |report |Stopping )([0-9a-z]+).*$/;
+  private jobIdFromTagsRe = /^.*([a-z0-9]{24}).*$/;
+
+  constructor(public readonly fields: FieldDefinition[]) {}
+
+  public getJobId({ message, log }: LogLine) {
+    let jobId: string;
+    // get the job id string
+    if (message.match(/Claiming/)) {
+      jobId = message.replace(this.claimingRe, '$1');
+    } else if (message.match(/[0-9a-z]{24}/)) {
+      jobId = message.replace(this.jobIdFromMessageRe, '$2');
+    } else {
+      const tags = log.logger;
+      jobId = tags.replace(this.jobIdFromTagsRe, '$1');
+    }
+    return jobId;
+  }
+
+  public getDocument(jobId: string, latest: object[]) {
+    return this.fields.reduce(
+      (acc, field) => ({
+        ...acc,
+        [field.name]: field.getValue(jobId, latest),
+      }),
+      {}
+    );
+  }
+  public isCompleteLog(jobId: string, message?: string) {
+    return message?.match(`Stopping ${jobId}`);
+  }
+}
+
+export const fieldDefinitions = new FieldHelper([
   ...datas.dates.map((obj) => ({ ...obj, type: 'date' as const })),
   ...datas.keywords.map((obj) => ({ ...obj, type: 'keyword' as const })),
   ...datas.numbers.map((obj) => ({ ...obj, type: 'integer' as const })),
   ...datas.booleans.map((obj) => ({ ...obj, type: 'boolean' as const })),
-];
+]);
